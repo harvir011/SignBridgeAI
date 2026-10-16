@@ -137,7 +137,7 @@ Prerequisites
 - A modern browser with camera and speech-synthesis support
 1. Clone the repository
 Replace YOUR-USERNAME with your GitHub username:
-git clone https://github.com/YOUR-USERNAME/SignBridge.git
+git clone https://github.com/harvir011/SignBridgeAI.git
 cd SignBridge
 2. Install dependencies
 npm install
@@ -217,7 +217,8 @@ Training output and collected landmark data may be generated locally and may not
 🤝 Contributing
 Issues, suggestions, and pull requests are welcome. For substantial changes, open an issue first to discuss the proposed improvement. Please avoid committing private or identifiable training samples without informed consent.
 📄 License
-No license is specified in this repository yet. Add a LICENSE file before describing the project as open source, and choose a license that matches how you want others to use and distribute your work.
+No license is specified in this repository yet.
+ Add a LICENSE file before describing the project as open source, and choose a license that matches how you want others to use and distribute your work.
 <div align="center">
 
 Built with AI, computer vision, and a goal of more inclusive communication.
