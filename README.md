@@ -92,54 +92,83 @@ I Love You	I LOVE YOU
 These are prototype mappings, not universal meanings. Sign languages vary by community and language, and many signs rely on motion, facial expression, body posture, and context.
 
 
-⚙️ How it works
 
-Webcam
+## System Architecture
 
-  │
-  
-  ▼
-  
-MediaPipe hand tracking
+SignBridge AI follows a **local-first, browser-based Edge AI architecture** that transforms webcam hand gestures into text and speech. It combines real-time hand tracking, landmark-based feature extraction, gesture classification, and an interactive communication interface.
 
-  │
-  
-  ▼
-  
-21 hand landmarks (x, y, z)
+### Architecture Overview
 
-  │
-  
-  ▼
-  
-Wrist-relative normalization
-(21 × 3 = 63 features)
+```mermaid
+flowchart TB
+    A(["📷 Webcam Input"]) --> B["Video Frame Capture"]
+    B --> C["MediaPipe Tasks Vision<br/>Hand & Gesture Recognition"]
 
-  │
-  
-  ▼
-  
-Built-in recognizer or optional custom model
+    C --> D["21 Hand Landmarks<br/>3D Coordinates"]
+    C --> E["Pretrained Gesture Recognition<br/>7 Supported Static Poses"]
 
-  │
-  
-  ▼
-  
-Confidence threshold + stability filtering
+    D --> F["Landmark Normalization<br/>63 Numerical Features"]
+    F --> G["Optional Custom Classifier<br/>TensorFlow.js MLP"]
 
-  │
-  
-  ▼
-  
-Editable text message
+    E --> H["Gesture Prediction"]
+    G --> H
 
-  │
-  
-  ▼
-  
-Browser text-to-speech
+    H --> I["Confidence Threshold<br/>& Stability Filtering"]
+    I --> J["Gesture-to-Label Mapping"]
+    J --> K["Editable Text Output"]
+    K --> L["Web Speech API<br/>Text-to-Speech"]
 
-Landmark preprocessing
+    F -.-> M[("Local Sample Storage")]
+    M -.-> N["JSON / CSV Export"]
+    N -.-> O["Python Training Pipeline"]
+    O -.-> P["Evaluation Reports<br/>& Trained Model"]
+    P -.-> G
+
+    style A fill:#172554,stroke:#60A5FA,color:#FFFFFF
+    style C fill:#312E81,stroke:#A5B4FC,color:#FFFFFF
+    style G fill:#064E3B,stroke:#34D399,color:#FFFFFF
+    style I fill:#78350F,stroke:#FBBF24,color:#FFFFFF
+    style K fill:#164E63,stroke:#67E8F9,color:#FFFFFF
+    style L fill:#164E63,stroke:#67E8F9,color:#FFFFFF
+```
+
+### Processing Pipeline
+
+| Stage | Component | Responsibility |
+|---|---|---|
+| 01 | Webcam API | Captures live video after user permission. |
+| 02 | MediaPipe Tasks Vision | Detects hand landmarks and recognizes supported gestures. |
+| 03 | Feature Engineering | Converts 21 three-dimensional landmarks into 63 normalized numerical features for custom classification. |
+| 04 | Gesture Classification | Uses the pretrained gesture recognizer and, when configured, an optional custom TensorFlow.js model. |
+| 05 | Prediction Filtering | Applies confidence thresholds and stability checks to reduce unreliable or repeated predictions. |
+| 06 | Text Generation | Maps recognized gestures to labels and builds an editable message. |
+| 07 | Speech Synthesis | Uses the browser's Web Speech API to speak the generated text. |
+
+### Custom Model Training Pipeline
+
+SignBridge AI also includes a data collection and model training workflow:
+
+1. **Collect:** Capture labeled hand-landmark samples through the browser-based Training Lab.
+2. **Export:** Save collected samples locally and export them as JSON or CSV.
+3. **Train:** Use the Python training script to train a custom static-pose classifier.
+4. **Evaluate:** Generate classification metrics and a confusion matrix using held-out samples.
+5. **Convert:** Convert the trained Keras model to TensorFlow.js format.
+6. **Integrate:** Load the converted model into the browser for custom gesture inference.
+
+### Edge AI & Privacy
+
+- **Local inference:** Video frames are processed in the browser rather than uploaded to a project backend.
+- **Local data handling:** Collected training samples are stored in browser local storage until exported or cleared.
+- **Browser-native output:** Text-to-speech uses the browser's speech synthesis API.
+- **Model flexibility:** The application supports pretrained static gestures and an optional custom-trained classifier.
+
+### Important Scope
+
+SignBridge AI is a limited-vocabulary gesture recognition prototype, not a complete sign-language translation system. Its demonstration labels are not validated translations of ASL or Indian Sign Language. Recognition performance depends on the training data, lighting, camera conditions, and signer variation.
+
+
+
+## Landmark preprocessing
 
 For custom-model training, each landmark's coordinates are shifted relative to the wrist (landmark 0). The shifted coordinates are scaled by the maximum Euclidean distance from the wrist, producing 63 normalized values. Training and browser inference must use the same preprocessing.
 
@@ -188,19 +217,23 @@ cd SignBridge
 
 2. Install dependencies
 
-npm install
+```npm install```
 
 3. Start the development server
 
-npm run dev
+```npm run dev```
+
 Open the localhost URL printed by Vite (typically http://localhost:5173) and allow camera access.
 
 4. Create a production build
 
-npm run build
+```npm run build```
+
 To preview the production build locally:
-npm run preview
-Important: Open the app using localhost or HTTPS rather than opening index.html directly with a file:// URL. The app copies MediaPipe WASM assets from its installed package during the predev and prebuild scripts. Hosted MediaPipe model assets may require an internet connection.
+```npm run preview```
+
+
+Important: **Open the app using localhost or HTTPS rather than opening index.html directly with a file:// URL. The app copies MediaPipe WASM assets from its installed package during the predev and prebuild scripts. Hosted MediaPipe model assets may require an internet connection.**
 
 
 🧪 Custom model training
@@ -213,19 +246,29 @@ The repository includes a Python training pipeline for experimenting with a cust
 5. Create a Python environment and install the training requirements.
 
 
-Windows PowerShell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r training/requirements.txt
-python training/train_classifier.py --data datasets/landmarks.json
-macOS / Linux
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r training/requirements.txt
-python training/train_classifier.py --data datasets/landmarks.json
+`Windows PowerShell`
+
+`python -m venv .venv`
+
+`.\.venv\Scripts\Activate.ps1`
+
+`pip install -r training/requirements.txt`
+
+`python training/train_classifier.py --data datasets/landmarks.json`
+
+`macOS / Linux`
+
+`python3 -m venv .venv`
+
+`source .venv/bin/activate`
+
+`pip install -r training/requirements.txt`
+
+`python training/train_classifier.py --data datasets/landmarks.json`
 
 
-The script writes a trained Keras model, metadata, training history, classification report, and confusion matrix to training/output/. For TensorFlow.js conversion and loading instructions, see [`training/README.md`](training/README.md).
+**The script writes a trained Keras model, metadata, training history, classification report, and confusion matrix to training/output/. For TensorFlow.js conversion and loading instructions, see [`training/README.md`](training/README.md).**
+
 Training recommendations
 
 - Capture examples across multiple sessions, hand positions, and lighting conditions.
@@ -331,5 +374,14 @@ No license is specified in this repository yet.
 
 
 Built with AI, computer vision, and a goal of more inclusive communication.
-SignBridge AI · More access. More inclusion. A brighter future.
+
+*SignBridge AI · More access. More inclusion. A brighter future.*
 </div>
+
+
+> [!NOTE]
+> Camera access is required for gesture recognition.
+
+> [!WARNING]
+> Gesture recognition may be less reliable in poor lighting.
+
