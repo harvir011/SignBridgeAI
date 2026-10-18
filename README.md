@@ -277,53 +277,65 @@ Training recommendations
 - Treat small-dataset results as preliminary; do not present them as general sign-language accuracy.
 
 
-📁 Project structure
+## 📁 Project Structure
 
-SignBridge/
-
-├── index.html
-
+```text
+SignBridgeAI/
+│
 ├── public/
-
 │   ├── mediapipe/
-
+│   │   └── wasm/
+│   │       ├── vision_wasm_internal.js
+│   │       ├── vision_wasm_internal.wasm
+│   │       ├── vision_wasm_module_internal.js
+│   │       ├── vision_wasm_module_internal.wasm
+│   │       ├── vision_wasm_nosimd_internal.js
+│   │       └── vision_wasm_nosimd_internal.wasm
+│   │
 │   └── models/
-
-├── src/
-
-│   ├── main.js
-
-│   └── style.css
-
+│       └── sign-classifier/
+│           └── README.md
+│
 ├── scripts/
-
 │   └── copy-mediapipe.js
-
+│
+├── src/
+│   ├── main.js
+│   └── style.css
+│
 ├── training/
-
 │   ├── README.md
-
 │   ├── requirements.txt
-
 │   └── train_classifier.py
-
-├── datasets/
-
-│   └── README.md
-
-├── docs/
-
-│   ├── system-architecture.md
-
-│   ├── prompt-documentation.md
-
-│   └── evaluation.md
-
+│
+├── index.html
 ├── package.json
-
 ├── package-lock.json
-
+├── vite.config.js
 └── README.md
+```
+
+### 🧩 Directory Breakdown
+
+| File / Directory | Description |
+|---|---|
+| `src/main.js` | Main JavaScript entry point for application functionality. |
+| `src/style.css` | Defines the application's visual appearance and layout. |
+| `public/mediapipe/wasm/` | Contains WebAssembly runtime files used by MediaPipe for browser-based vision processing. |
+| `public/models/sign-classifier/` | Directory reserved for sign-classifier model resources and documentation. |
+| `scripts/copy-mediapipe.js` | Script for copying MediaPipe resources into the required project location. |
+| `training/train_classifier.py` | Python script for training the sign-classification model. |
+| `training/requirements.txt` | Lists Python dependencies required for the training workflow. |
+| `training/README.md` | Documents the model-training workflow and instructions. |
+| `package.json` | Defines Node.js dependencies and project scripts. |
+| `vite.config.js` | Configures the Vite development and build environment. |
+| `index.html` | HTML entry point for the web application. |
+
+### 🧠 Project Organization
+
+SignBridgeAI separates its core application, browser-based vision resources, and model-training workflow into distinct directories. This organization helps keep frontend development, MediaPipe integration, and machine-learning experimentation manageable.
+
+
 
 
 Training output and collected landmark data may be generated locally and may not exist in a fresh clone.
