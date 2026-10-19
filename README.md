@@ -2,9 +2,9 @@
 
 <img src="assets/signbridge-banner.png" alt="SignBridge AI — Breaking Communication Barriers with Real-Time Gesture Recognition" width="100%">
 
-SignBridge AI 🤟
+# SignBridge AI 🤟
 
-Breaking communication barriers with real-time gesture recognition
+**Breaking communication barriers with real-time gesture recognition**
 
 
 Turn hand gestures into text and speech — right in your browser.
